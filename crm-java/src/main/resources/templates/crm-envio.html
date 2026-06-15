@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINTRACK CRM - Envios Preparados</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f6;
+            color: #262730;
+            min-height: 100vh;
+            padding: 32px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .header h1 { font-size: 1.8rem; color: #1f6e3a; font-weight: 700; }
+        .header p { color: #666; margin-top: 6px; font-size: 0.95rem; }
+
+        .resumo {
+            background: #e8f5ee;
+            border: 1px solid #b7dfc8;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 28px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .badge {
+            background: #25D366;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.3rem;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .resumo p { color: #2c5f3e; font-size: 0.92rem; line-height: 1.5; }
+        .resumo strong { color: #1a7a40; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 18px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card-cliente {
+            background: #ffffff;
+            border: 1px solid #dde1ea;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .card-cliente .nome {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1d2e;
+        }
+        .info-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .badge-info {
+            font-size: 0.72rem;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: #f0f2f6;
+            border: 1px solid #dde1ea;
+            color: #555;
+            font-weight: 500;
+        }
+        .badge-info.green {
+            background: #e8f5ee;
+            border-color: #b7dfc8;
+            color: #1a7a40;
+        }
+
+        .msg-edit {
+            width: 100%;
+            min-height: 120px;
+            padding: 11px 13px;
+            background: #f8f9fb;
+            border: 1px solid #dde1ea;
+            border-radius: 8px;
+            font-size: 0.87rem;
+            color: #333;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .msg-edit:focus {
+            outline: none;
+            border-color: #25D366;
+            background: #fff;
+        }
+        .edit-hint {
+            font-size: 0.72rem;
+            color: #aaa;
+            margin-top: -4px;
+        }
+
+        .btn-whatsapp {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: #25D366;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .btn-whatsapp:hover { background: #1ebe59; }
+
+        .rodape { text-align: center; margin-top: 28px; }
+        .btn-voltar {
+            display: inline-block;
+            padding: 11px 26px;
+            background: #fff;
+            color: #555;
+            border: 1px solid #dde1ea;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .btn-voltar:hover { background: #f0f2f6; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>✅ Envios Preparados</h1>
+    <p>Edite a mensagem se necessário e clique em <strong>Enviar WhatsApp</strong></p>
+</div>
+
+<div class="resumo" style="margin-bottom:28px">
+    <div class="badge" th:text="${totalClientes}">0</div>
+    <p><strong th:text="${totalClientes}">0</strong> clientes importados. Mensagem editável por cliente antes do envio.</p>
+</div>
+
+<div class="grid">
+    <div class="card-cliente" th:each="envio,iter : ${envios}">
+        <div class="nome" th:text="${envio.nome}">Nome</div>
+
+        <div class="info-row">
+            <span class="badge-info green" th:text="'📱 ' + ${envio.telefoneFormatado}"></span>
+            <span class="badge-info" th:if="${!#strings.isEmpty(envio.veiculo)}" th:text="'🚗 ' + ${envio.veiculo}"></span>
+            <span class="badge-info" th:if="${!#strings.isEmpty(envio.placa)}" th:text="'🔲 ' + ${envio.placa}"></span>
+        </div>
+
+        <!-- Textarea editável com a mensagem personalizada -->
+        <textarea
+            class="msg-edit"
+            th:id="'msg-' + ${iter.index}"
+            th:text="${envio.mensagem}">
+        </textarea>
+        <p class="edit-hint">✏️ Edite a mensagem acima antes de enviar</p>
+
+        <!-- Número do WhatsApp guardado em data attribute -->
+        <button
+            class="btn-whatsapp"
+            th:data-numero="${envio.telefoneFormatado}"
+            th:data-idx="${iter.index}"
+            onclick="enviarWhats(this)">
+            📱 Enviar WhatsApp
+        </button>
+    </div>
+</div>
+
+<div class="rodape">
+    <a href="/crm" class="btn-voltar">← Importar novo arquivo</a>
+</div>
+
+<script>
+function enviarWhats(btn) {
+    var idx = btn.getAttribute('data-idx');
+    var numero = btn.getAttribute('data-numero');
+    var mensagem = document.getElementById('msg-' + idx).value;
+    var url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(mensagem);
+    window.open(url, '_blank');
+}
+</script>
+</body>
+</html>
